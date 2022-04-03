@@ -67,7 +67,7 @@ public class CharacterMovement : MonoBehaviour
         }
 
         // Rotate movement inputs from world space -> player space
-        moveInput = transform.TransformDirection(moveInput) * moveSpeed;
+        moveInput = transform.TransformDirection(moveInput);
         _Rigidbody.AddForce(moveInput * moveSpeed, ForceMode.VelocityChange);
     }
 
