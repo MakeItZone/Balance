@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System;
 
 public class CharacterMovement : MonoBehaviour
 {
@@ -62,6 +63,7 @@ public class CharacterMovement : MonoBehaviour
         // The IsGrounded() check let's you keep sliding while in the air.
         // remove/comment out to "slide" like a hovercraft/plane
         if ((moveInput.x <= moveThreshold) && (moveInput.x >= -moveThreshold) && (moveInput.z <= moveThreshold) && (moveInput.z >= -moveThreshold) && !IsGrounded())
+        //if((Math.Abs(moveInput.x) <= moveThreshold) && (Math.Abs(moveInput.z) <= moveThreshold) && IsGrounded())
         {
             _Rigidbody.velocity = new Vector3(0, _Rigidbody.velocity.y, 0);
         }
