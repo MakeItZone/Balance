@@ -63,7 +63,7 @@ public class CharacterMovement : MonoBehaviour
 		// remove/comment out to "slide" like a hovercraft/plane
 		if ((moveInput.x <= moveThreshold) && (moveInput.x >= -moveThreshold) && (moveInput.z <= moveThreshold) && (moveInput.z >= -moveThreshold) && IsGrounded())
 		{
-			_Rigidbody.velocity = new Vector3(0, _Rigidbody.velocity.y, 0);
+			//_Rigidbody.velocity = new Vector3(0, _Rigidbody.velocity.y, 0);
 		}
 
 		// Rotate movement inputs from world space -> player space
