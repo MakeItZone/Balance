@@ -3,7 +3,10 @@
 public class CharacterMovement : MonoBehaviour
 {
 	[Tooltip("Player movement speed")]
-	public float moveSpeed = 0.25f;
+	public float moveSpeed = 32f;
+
+	[Tooltip("Airborne player movement speed")]
+	public float airMoveSpeed = 0.25f;
 
 	[Tooltip("Input axis threshold to insta-stop player")]
 	public float moveThreshold = 0.1f;
@@ -61,15 +64,19 @@ public class CharacterMovement : MonoBehaviour
 		// No movement input? Instant stop player movement.
 		// The IsGrounded() check let's you keep sliding while in the air.
 		// remove/comment out to "slide" like a hovercraft/plane
-		if ((moveInput.x <= moveThreshold) && (moveInput.x >= -moveThreshold) && (moveInput.z <= moveThreshold) && (moveInput.z >= -moveThreshold) && IsGrounded())
+		/*if ((moveInput.x <= moveThreshold) && (moveInput.x >= -moveThreshold) && (moveInput.z <= moveThreshold) && (moveInput.z >= -moveThreshold) && IsGrounded())
 		{
-			//_Rigidbody.velocity = new Vector3(0, _Rigidbody.velocity.y, 0);
-		}
+			_Rigidbody.velocity = new Vector3(0, _Rigidbody.velocity.y, 0);
+		}*/
 
 		// Rotate movement inputs from world space -> player space
 		moveInput = transform.TransformDirection(moveInput);
-		//_Rigidbody.AddForce(moveInput * moveSpeed, ForceMode.VelocityChange);
-		_Rigidbody.velocity = new Vector3(moveInput.x * moveSpeed, 0, moveInput.z * moveSpeed);
+		if(IsGrounded()) {
+			_Rigidbody.velocity = new Vector3(moveInput.x * moveSpeed, _Rigidbody.velocity.y, moveInput.z * moveSpeed);
+		}
+		else {
+			_Rigidbody.AddForce(moveInput * airMoveSpeed, ForceMode.VelocityChange);
+		}
 	}
 
 	private bool IsGrounded()
