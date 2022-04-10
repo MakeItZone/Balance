@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6058068126396942485}
   - component: {fileID: 6058068126396942484}
   - component: {fileID: 6058068126396942487}
-  - component: {fileID: 6058068126396942488}
+  - component: {fileID: 8900314879194090631}
   m_Layer: 0
   m_Name: testEnemy
   m_TagString: Untagged
@@ -110,7 +110,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 84fbf0a3dad69444e8782edfa769c4b1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!195 &6058068126396942488
+--- !u!195 &8900314879194090631
 NavMeshAgent:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -124,7 +124,7 @@ NavMeshAgent:
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
-  m_StoppingDistance: 2
+  m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
