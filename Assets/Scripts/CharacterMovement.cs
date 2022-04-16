@@ -14,6 +14,15 @@ public class CharacterMovement : MonoBehaviour
 	[Tooltip("Player jump force")]
 	public float jumpPower = 4f;
 
+	[Tooltip("multiplier used to calculate boost applied to jump when moving")]
+	public float jumpMultiplier = 0.5f;
+
+	[Tooltip("jump multiplier limit")]
+	public float jumpMultLimit = 1f;
+
+	[Tooltip("Number to multiply movement speed by when sprinting")]
+	public float SprintMultiplier = 1.5f;
+
 	private Rigidbody _Rigidbody;
 
 	private CapsuleCollider _col;
@@ -44,7 +53,7 @@ public class CharacterMovement : MonoBehaviour
 		if (IsGrounded() && Input.GetButtonDown("Jump"))
 		{
 			//Add upward force to the rigid body when we press jump.
-			_Rigidbody.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+			_Rigidbody.AddForce(Vector3.up * (jumpPower * (1 + Mathf.Clamp(Mathf.Abs(_Rigidbody.velocity.x) + Mathf.Abs(_Rigidbody.velocity.z), 0, jumpMultLimit) * jumpMultiplier)), ForceMode.Impulse);
 		}
 
 		if (Input.GetKeyDown(KeyCode.Escape))
@@ -70,6 +79,11 @@ public class CharacterMovement : MonoBehaviour
 		}*/
 
 		// Rotate movement inputs from world space -> player space
+
+		if(Input.GetKey(KeyCode.LeftShift)) {
+			moveInput = new Vector3(moveInput.x * SprintMultiplier, moveInput.y, moveInput.z * SprintMultiplier);
+		}
+
 		moveInput = transform.TransformDirection(moveInput);
 		if(IsGrounded()) {
 			_Rigidbody.velocity = new Vector3(moveInput.x * moveSpeed, _Rigidbody.velocity.y, moveInput.z * moveSpeed);
