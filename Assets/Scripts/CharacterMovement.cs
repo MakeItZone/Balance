@@ -8,11 +8,26 @@ public class CharacterMovement : MonoBehaviour
 	[Tooltip("Airborne player movement speed")]
 	public float airMoveSpeed = 0.25f;
 
-	[Tooltip("Input axis threshold to insta-stop player")]
+	[Tooltip("Input axis threshold to insta-stop player (removed)")]
 	public float moveThreshold = 0.1f;
 
 	[Tooltip("Player jump force")]
 	public float jumpPower = 4f;
+
+	[Tooltip("Multiplier used to calculate boost applied to jump when moving")]
+	public float jumpMultiplier = 0.5f;
+
+	[Tooltip("Jump multiplier limit. is incremented by one internally")]
+	public float jumpMultLimit = 1f;
+
+	[Tooltip("Number movement speed is multiplied by when sprinting")]
+	public float SprintMultiplier = 1.5f;
+
+	[Tooltip("Maximum allowable altitude for the player")]
+	public float altitudeCap = 10f;
+
+	[Tooltip("Player y velocity to apply when altitude cap is reached")]
+	public float returnForce = -1f;
 
 	private Rigidbody _Rigidbody;
 
@@ -23,36 +38,32 @@ public class CharacterMovement : MonoBehaviour
 
 	// Awake() vs Start() - see https://gamedevbeginner.com/start-vs-awake-in-unity/
 	// Use Awake() this for initialization of reference to components in this GameObject
-	void Awake()
-	{
+	void Awake() { //runs before start
 		// see https://docs.unity3d.com/ScriptReference/Component.TryGetComponent.html
 		TryGetComponent(out _Rigidbody);
 		TryGetComponent(out _col);
 	}
 
-	void Start()
-	{
-		Cursor.lockState = CursorLockMode.Locked;
+	void Start() { //runs after awake
+		Cursor.lockState = CursorLockMode.Locked; //hide cursor and lock it to the game window when playing
 	}
 
-	// Update is called once per frame draw
-	void Update()
-	{
+	void Update() { //runs every frame
 		// Try to always get your player inputs in the Update method.
 		moveInput = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
-		if (IsGrounded() && Input.GetButtonDown("Jump"))
-		{
+		if (IsGrounded() && Input.GetButtonDown("Jump")) {
 			//Add upward force to the rigid body when we press jump.
-			_Rigidbody.AddForce(Vector3.up * jumpPower, ForceMode.Impulse);
+			_Rigidbody.AddForce(Vector3.up * (jumpPower * (1 + Mathf.Clamp(Mathf.Abs(_Rigidbody.velocity.x) + Mathf.Abs(_Rigidbody.velocity.z), 0, jumpMultLimit) * jumpMultiplier)), ForceMode.Impulse);
 		}
 
-		if (Input.GetKeyDown(KeyCode.Escape))
+		if (Input.GetKeyDown(KeyCode.Escape)) //release cursor when escape is pressed
 			Cursor.lockState = CursorLockMode.None;
+
+		if(_Rigidbody.position.y > altitudeCap) _Rigidbody.velocity = new Vector3(_Rigidbody.velocity.x, returnForce, _Rigidbody.velocity.z); //prevent escaping the map by adding an invisible ceiling
 	}
 
-	private void FixedUpdate()
-	{
+	private void FixedUpdate() { //called at regular intervals
 		// DON'T FORGET:
 		// on players rigidbody, set: interpolation to interpolate, and collision detection to continuous
 
@@ -70,17 +81,21 @@ public class CharacterMovement : MonoBehaviour
 		}*/
 
 		// Rotate movement inputs from world space -> player space
-		moveInput = transform.TransformDirection(moveInput);
-		if(IsGrounded()) {
+
+		if(Input.GetKey(KeyCode.LeftShift)) { //sprint
+			moveInput = new Vector3(moveInput.x * SprintMultiplier, moveInput.y, moveInput.z * SprintMultiplier);
+		}
+
+		moveInput = transform.TransformDirection(moveInput); //align movements to player space
+		if(IsGrounded()) { //use ground movement system when on the, well, ground
 			_Rigidbody.velocity = new Vector3(moveInput.x * moveSpeed, _Rigidbody.velocity.y, moveInput.z * moveSpeed);
 		}
-		else {
+		else { //otherwise, the arial movement system is used
 			_Rigidbody.AddForce(moveInput * airMoveSpeed, ForceMode.VelocityChange);
 		}
 	}
 
-	private bool IsGrounded()
-	{
+	private bool IsGrounded() { //check if the player is grounded. could do with improvement
 		//Test that we are grounded by drawing an invisible line (raycast)
 		//If this hits a solid object e.g. floor then we are grounded.
 		return Physics.Raycast(transform.position, Vector3.down, _col.bounds.extents.y + 0.1f);
